@@ -1,8 +1,18 @@
-import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+'use server'
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-export default async function authGuard() {
+interface User {
+    id: string;
+}
+
+interface AuthGuard {
+    authenticated: boolean;
+    message?: string;
+    user?: User | string | JwtPayload | undefined;
+}
+
+export default async function authGuard(): Promise<AuthGuard> {
 
     const cookieStore = cookies();
     const token = (await cookieStore).get("token")?.value;
@@ -10,7 +20,7 @@ export default async function authGuard() {
     if (!token) return { authenticated: false, message: "No token in cookies" };
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as string | jwt.JwtPayload;
         return { authenticated: true, user: decoded };
     } catch {
         return { authenticated: false, message: "Invalid token" };

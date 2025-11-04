@@ -6,6 +6,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
+export interface FormDataPayload {
+  name: string;
+  email: string;
+  password: string;
+  dob: string;
+}
 
 export async function loginUser(email: string, password: string) {
   await connectDB();
@@ -39,4 +45,32 @@ export async function loginUser(email: string, password: string) {
   });
 
   return { success: true, message: "Login successful", token };
+}
+
+export async function registerUser(formData: FormDataPayload) {
+  await connectDB();
+
+  const { name, email, dob, password } = formData;
+
+  if (!name || !email || !dob || !password) {
+    return { success: false, message: "All fields are required" };
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return { success: false, message: "User already exists" };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = new User({
+    name,
+    email,
+    dob,
+    password: hashedPassword,
+  });
+
+  await newUser.save();
+
+  return { success: true, message: "User registered successfully" };
 }

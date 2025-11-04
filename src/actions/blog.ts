@@ -4,6 +4,16 @@ import "@/model/User";
 import authGuard from "@/lib/authGuard";
 import { connectDB } from "@/lib/mongodb"
 import Blog from "@/model/Blog";
+import { cache } from "react";
+
+export interface Blogs {
+    title: string;
+    content: string;
+    author: {
+        name: string;
+    };
+    updatedAt: string;
+}
 
 export async function createBlog(payload) {
     try {
@@ -17,7 +27,7 @@ export async function createBlog(payload) {
 
         await Blog.create(payload);
         return { success: true, message: "Blog created successfully" };
-    } catch (error) {
+    } catch (error: any) {
         console.log(876876, error);
 
         return { success: false, message: error?.message }
@@ -25,7 +35,7 @@ export async function createBlog(payload) {
     }
 
 }
-export async function getAllBlog() {
+export async function getAllBlog(): Promise<Blogs[]> {
     try {
         await connectDB()
         const { authenticated, user, message } = await authGuard();
@@ -36,16 +46,16 @@ export async function getAllBlog() {
             .sort({ updatedAt: -1 })
             .lean();
 
-        return list
+        return JSON.parse(JSON.stringify(list));
 
     } catch (error) {
 
         console.log(error);
-
+        return [];
 
     }
 }
-export async function getBlog() {
+export async function getBlog(): Promise<Blogs[]> { // my blog
     try {
         await connectDB()
         const { authenticated, user, message } = await authGuard();
@@ -61,7 +71,73 @@ export async function getBlog() {
     } catch (error) {
 
         console.log(error);
-
+        return []
 
     }
 }
+export async function getBlogById(id: string): Promise<Blogs> { // my blog
+    try {
+        await connectDB()
+        const { authenticated, user, message } = await authGuard();
+
+        const blog = await Blog.findById(id).populate("author", "name email").lean();
+        return blog
+
+    } catch (error) {
+
+        console.log(error);
+        return {}
+
+    }
+}
+
+
+export async function deleteBlog(id: string) {
+    try {
+        await connectDB();
+        const { authenticated, user, message } = await authGuard();
+
+        if (!authenticated) {
+            return { success: false, message: "Unauthorized access" };
+        }
+
+        const blog = await Blog.findById(id);
+        if (!blog) {
+            return { success: false, message: "Blog not found" };
+        }
+
+        await Blog.findByIdAndDelete(id);
+        return { success: true, message: "Blog deleted successfully" };
+
+    } catch (error) {
+        console.error("Delete error:", error);
+        return { success: false, message: "Something went wrong" };
+
+    }
+
+    
+}
+export async function updateBlog(id,payload){
+    try {
+        await connectDB()
+        const authData = await authGuard()
+        if(authData.authenticated === false){
+            return { success: false, message: "Unauthorized access" };
+        
+        }
+        const blog = await Blog.findById(id);
+        if (!blog) {
+            return { success: false, message: "Blog not found" };
+        }
+
+        await Blog.findByIdAndUpdate(id, {$set:payload});
+        return { success: true, message: "Blog updated successfully" };
+
+
+        
+    } catch (error) {
+        
+    }
+}
+    
+
