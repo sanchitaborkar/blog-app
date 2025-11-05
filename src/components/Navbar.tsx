@@ -12,7 +12,6 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-
   const userDetails = async () => {
     try {
       const result = await getUserDetails();
@@ -51,17 +50,18 @@ export default function Navbar() {
     }
   };
 
-  if (pathname === '/sign-in' || pathname === '/sign-up') return null;
+  
+  if (pathname === "/sign-in" || pathname === "/sign-up") return null;
 
   return (
     <nav className="bg-white/70 backdrop-blur-md border-b border-gray-200 shadow-sm sticky w-full top-0 left-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        {/* Logo */}
+        
         <Link href="/" className="text-2xl font-extrabold text-blue-600">
           MindBridge
         </Link>
 
-        {/* Navigation Links */}
+        
         <div className="flex gap-6 text-gray-700 font-medium items-center">
           <Link
             href="/"
@@ -78,6 +78,7 @@ export default function Navbar() {
           >
             Create Blog
           </Link>
+
           <Link
             href="/my-blog"
             className={`hover:text-blue-600 ${pathname === "/my-blog" ? "text-blue-600 font-semibold" : ""
@@ -86,12 +87,16 @@ export default function Navbar() {
             My Blogs
           </Link>
 
-
           {isLoggedIn ? (
             <>
-              <span className="text-gray-800 font-medium">
+              {/* 👇 Clickable Username */}
+              <Link
+                href="/profile"
+                className="text-gray-800 font-medium hover:text-blue-600 transition"
+              >
                 Hi, {user?.name || "User"}
-              </span>
+              </Link>
+
               <button
                 onClick={handleLogout}
                 className="cursor-pointer bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow transition-all"
