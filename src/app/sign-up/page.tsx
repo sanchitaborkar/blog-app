@@ -1,21 +1,24 @@
 'use client'
-import { registerUser } from "@/actions/auth";
+import { FormDataPayload, registerUser } from "@/actions/auth";
+import { APIResponse } from "@/actions/user";
 import ManageUser from "@/components/ManageUser";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 export default function SignUpPage() {
-    const [apiStatus, setApiStatus] = useState(null)
+    const [apiStatus, setApiStatus]= useState <APIResponse | undefined>(undefined)
     const router = useRouter();
+    
 
-    async function submitHandler(name, email, dateOfBirth, password) {
+    async function submitHandler(name:string, email:string, dateOfBirth:string, password:string) {
         console.log(name, email, password, dateOfBirth)
         try {
-            const formData: any = {
+            const formData: FormDataPayload = {
                 name: name,
                 email: email,
                 password: password,
-                dob: dateOfBirth
+                dob: dateOfBirth,
+                
             }
 
             const res = await registerUser(formData);

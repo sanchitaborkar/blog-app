@@ -1,4 +1,10 @@
-export default function APIStatusCard({apiStatus}) {
+import { APIResponse } from "@/actions/user";
+
+interface APIStatusCardProps{
+    apiStatus: APIResponse
+}
+
+export default function APIStatusCard({apiStatus}: APIStatusCardProps) {
     return (
         <>
             {apiStatus?.success === true ? (

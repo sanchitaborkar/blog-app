@@ -7,6 +7,7 @@ import Blog from "@/model/Blog";
 import { cache } from "react";
 
 export interface Blogs {
+    _id:string;
     title: string;
     content: string;
     author: {
@@ -15,7 +16,13 @@ export interface Blogs {
     updatedAt: string;
 }
 
-export async function createBlog(payload) {
+interface BLogPayload {
+    title: string;
+    content: string;
+    author?: string;
+}
+
+export async function createBlog(payload: BLogPayload) {
     try {
         await connectDB();
 
@@ -23,7 +30,10 @@ export async function createBlog(payload) {
         if (!authenticated) {
             return { authenticated, message }
         }
-        payload.author = user?.id;
+
+        if (user?.id) {
+            payload.author = user?.id;
+        }
 
         await Blog.create(payload);
         return { success: true, message: "Blog created successfully" };
@@ -60,13 +70,12 @@ export async function getBlog(): Promise<Blogs[]> { // my blog
         await connectDB()
         const { authenticated, user, message } = await authGuard();
 
-        console.log(authenticated, user, message);
         const list = await Blog.find({ author: user?.id })
             .populate("author", "name email")
             .sort({ updatedAt: -1 })
             .lean();
 
-        return list
+        return JSON.parse(JSON.stringify(list));
 
     } catch (error) {
 
@@ -75,18 +84,18 @@ export async function getBlog(): Promise<Blogs[]> { // my blog
 
     }
 }
-export async function getBlogById(id: string): Promise<Blogs> { // my blog
+export async function getBlogById(id: string): Promise<Blogs | null> { // my blog
     try {
         await connectDB()
         const { authenticated, user, message } = await authGuard();
 
         const blog = await Blog.findById(id).populate("author", "name email").lean();
-        return blog
+        return JSON.parse(JSON.stringify(blog));
 
     } catch (error) {
 
         console.log(error);
-        return {}
+        return null;
 
     }
 }
@@ -115,29 +124,29 @@ export async function deleteBlog(id: string) {
 
     }
 
-    
+
 }
-export async function updateBlog(id,payload){
+export async function updateBlog(id: string, payload: BLogPayload) {
     try {
         await connectDB()
         const authData = await authGuard()
-        if(authData.authenticated === false){
+        if (authData.authenticated === false) {
             return { success: false, message: "Unauthorized access" };
-        
+
         }
         const blog = await Blog.findById(id);
         if (!blog) {
             return { success: false, message: "Blog not found" };
         }
 
-        await Blog.findByIdAndUpdate(id, {$set:payload});
+        await Blog.findByIdAndUpdate(id, { $set: payload });
         return { success: true, message: "Blog updated successfully" };
 
 
-        
+
     } catch (error) {
-        
+
     }
 }
-    
+
 

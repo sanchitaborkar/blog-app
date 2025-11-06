@@ -3,7 +3,14 @@
 import React, { useEffect, useState } from "react";
 import APIStatusCard from "./APIStatusCard";
 
-export default function ManageBlog({ isNew, apiStatus, handleSubmit, blogData }) {
+interface ManageBlogProps{
+    isNew:Boolean;
+    apiStatus:any;
+    handleSubmit:(title:string, Content:string)=>void
+    blogData?:any
+}
+
+export default function ManageBlog({ isNew, apiStatus, handleSubmit, blogData }:ManageBlogProps) {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
 

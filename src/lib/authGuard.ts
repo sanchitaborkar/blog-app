@@ -9,7 +9,7 @@ interface User {
 interface AuthGuard {
     authenticated: boolean;
     message?: string;
-    user?: User | string | JwtPayload | undefined;
+    user?: User;
 }
 
 export default async function authGuard(): Promise<AuthGuard> {
@@ -21,7 +21,7 @@ export default async function authGuard(): Promise<AuthGuard> {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as string | jwt.JwtPayload;
-        return { authenticated: true, user: decoded };
+        return { authenticated: true, user: decoded as {id: string} };
     } catch {
         return { authenticated: false, message: "Invalid token" };
     }

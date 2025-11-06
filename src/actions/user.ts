@@ -4,6 +4,22 @@ import authGuard from "@/lib/authGuard";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/model/User";
 
+export interface UserData {
+ name:string;
+ email:string;
+ dateOfBirth:string;
+ password?:string;
+}
+
+// export interface UserDataPayload extends UserData {
+//  dob: string;
+// }
+
+export interface APIResponse {
+    success: boolean;
+    message: string;
+}
+
 export async function getUserDetails() {
   try {
     await connectDB();
@@ -28,7 +44,7 @@ export async function getUserDetails() {
     return { success: false, message: error.message || "Internal Server Error" };
   }
 }
-export async function updateProfile(payload){
+export async function updateProfile(payload:UserData){
     try {
         console.log(3434, payload)
         await connectDB()

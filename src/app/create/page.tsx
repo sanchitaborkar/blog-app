@@ -18,6 +18,6 @@ export default function CreateBlog() {
   };
 
   return (
-    <ManageBlog isNew={true} apiStatus={apiStatus} handleSubmit={handleSubmit}/>
+    <ManageBlog isNew={true} apiStatus={apiStatus} handleSubmit={handleSubmit} />
   );
 }

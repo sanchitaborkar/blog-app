@@ -10,7 +10,7 @@ export default function UpdateBlog() {
     const [blogData, setBlogData] = useState<Blogs | null>(null);
 
     const params = useParams(); // gives access to dynamic segments
-    const id = params.id;
+    const id = params.id as string;
 
     const router = useRouter();
 

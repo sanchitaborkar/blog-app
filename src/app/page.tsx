@@ -72,9 +72,9 @@ export default function Home() {
                 </p>
 
                 {/* Category Tag */}
-                <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                {/* <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
                   {blog.category || "General"}
-                </span>
+                </span> */}
 
                 <div className="flex justify-between items-center text-sm text-gray-600 mt-2">
                   <p>✍️ {blog.author?.name || "Unknown"}</p>

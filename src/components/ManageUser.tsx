@@ -4,7 +4,14 @@ import { FormEvent, useEffect, useState } from "react"
 import Link from "next/link";
 import APIStatusCard from "./APIStatusCard";
 
-export default function ManageUser({ submitHandler, apiStatus, userData, isSignUp }) {
+interface ManageUserProps {
+    submitHandler: (name:string,email:string,dateOfBirth:string,password:string) => void;
+    apiStatus: any;
+    userData?: any;
+    isSignUp?: boolean;
+}
+
+export default function ManageUser({ submitHandler, apiStatus, userData, isSignUp }:ManageUserProps ) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -22,10 +29,10 @@ export default function ManageUser({ submitHandler, apiStatus, userData, isSignU
     useEffect(() => {
         console.log("User data received:", userData);
 
-        if (userData && userData.user) {
-            setName(userData.user.name || "");
-            setEmail(userData.user.email || "");
-            setDateOfBirth(userData.user.dob || "");
+        if (userData) {
+            setName(userData.name || "");
+            setEmail(userData.email || "");
+            setDateOfBirth(userData.dob || "");
         }
     }, [userData]);
 
