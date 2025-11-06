@@ -4,7 +4,7 @@ import "@/model/User";
 import authGuard from "@/lib/authGuard";
 import { connectDB } from "@/lib/mongodb"
 import Blog from "@/model/Blog";
-import { cache } from "react";
+import { APIResponse } from "./user";
 
 export interface Blogs {
     _id:string;
@@ -22,13 +22,13 @@ interface BLogPayload {
     author?: string;
 }
 
-export async function createBlog(payload: BLogPayload) {
+export async function createBlog(payload: BLogPayload): Promise<APIResponse> {
     try {
         await connectDB();
 
         const { authenticated, user, message } = await authGuard();
         if (!authenticated) {
-            return { authenticated, message }
+            return { success: false, message }
         }
 
         if (user?.id) {
@@ -37,11 +37,9 @@ export async function createBlog(payload: BLogPayload) {
 
         await Blog.create(payload);
         return { success: true, message: "Blog created successfully" };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-        console.log(876876, error);
-
         return { success: false, message: error?.message }
-
     }
 
 }

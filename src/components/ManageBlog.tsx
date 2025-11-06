@@ -1,13 +1,15 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import APIStatusCard from "./APIStatusCard";
+import { APIResponse } from "@/actions/user";
 
 interface ManageBlogProps{
-    isNew:Boolean;
-    apiStatus:any;
-    handleSubmit:(title:string, Content:string)=>void
-    blogData?:any
+    isNew: boolean;
+    apiStatus: APIResponse | undefined;
+    handleSubmit:(title:string, Content:string)=>void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    blogData?: any;
 }
 
 export default function ManageBlog({ isNew, apiStatus, handleSubmit, blogData }:ManageBlogProps) {
@@ -19,7 +21,7 @@ export default function ManageBlog({ isNew, apiStatus, handleSubmit, blogData }:
         setTitle(blogData?.title)
     }, [blogData])
 
-    const handleSubmitForm = async (e: any) => {
+    const handleSubmitForm = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         handleSubmit(title, content);
     };
@@ -33,7 +35,7 @@ export default function ManageBlog({ isNew, apiStatus, handleSubmit, blogData }:
                     }
                 </h2>
 
-                <APIStatusCard apiStatus={apiStatus} />
+                { apiStatus && <APIStatusCard apiStatus={apiStatus} /> }
 
                 <form onSubmit={handleSubmitForm} className="space-y-6">
                     {/* Title */}

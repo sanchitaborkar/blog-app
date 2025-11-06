@@ -36,7 +36,7 @@ export default function Home() {
           Inspire & Create <span className="text-blue-600">Stories</span>
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          "Turning logic into magic"
+          &quot;Turning logic into magic&quot;
         </p>
         <Link
           href="/create"

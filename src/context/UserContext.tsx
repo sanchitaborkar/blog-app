@@ -4,6 +4,7 @@
 import { getUserDetails } from '@/actions/user';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UserType = any;
 
 const UserContext = createContext<{

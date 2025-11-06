@@ -8,6 +8,7 @@ export async function logoutUser() {
     (await cookies()).delete("token");
 
     return { success: true, message: "Logout successful" };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Logout Error:", error);
     return { success: false, message: "Logout failed" };

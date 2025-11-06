@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 export interface FormDataPayload {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   dob: string;
 }
 

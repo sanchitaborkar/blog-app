@@ -1,12 +1,13 @@
 'use client'
 
 import { Blogs, getBlogById, updateBlog } from "@/actions/blog";
+import { APIResponse } from "@/actions/user";
 import ManageBlog from "@/components/ManageBlog";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function UpdateBlog() {
-    const [apiStatus, setApiStatus] = useState<any>(null);
+    const [apiStatus, setApiStatus] = useState<APIResponse | undefined>();
     const [blogData, setBlogData] = useState<Blogs | null>(null);
 
     const params = useParams(); // gives access to dynamic segments

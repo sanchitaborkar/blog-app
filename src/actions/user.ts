@@ -3,6 +3,7 @@
 import authGuard from "@/lib/authGuard";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/model/User";
+import { FormDataPayload } from "./auth";
 
 export interface UserData {
  name:string;
@@ -17,7 +18,7 @@ export interface UserData {
 
 export interface APIResponse {
     success: boolean;
-    message: string;
+    message?: string;
 }
 
 export async function getUserDetails() {
@@ -39,12 +40,13 @@ export async function getUserDetails() {
     }
 
     return { success: true, user: JSON.parse(JSON.stringify(userDetails)) };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error in getUserDetails:", error);
     return { success: false, message: error.message || "Internal Server Error" };
   }
 }
-export async function updateProfile(payload:UserData){
+export async function updateProfile(payload: FormDataPayload){
     try {
         console.log(3434, payload)
         await connectDB()

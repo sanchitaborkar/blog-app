@@ -1,12 +1,13 @@
 'use client'
 
 import { createBlog } from "@/actions/blog";
+import { APIResponse } from "@/actions/user";
 import ManageBlog from "@/components/ManageBlog";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export default function CreateBlog() {
-  const [apiStatus, setApiStatus] = useState<any>(null);
+  const [apiStatus, setApiStatus] = useState<APIResponse | undefined>();
 
   const router = useRouter();
 

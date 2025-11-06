@@ -38,7 +38,7 @@ export default function SignIn() {
                 <div className="mt-8">
                     <button className="w-full rounded-xl bg-blue-600 px-4 py-2 text-white font-semibold hover:bg-blue-700 transition duration-200">Sign in</button>
                 </div>
-                <div className="mt-6 text-center">Don't have account?
+                <div className="mt-6 text-center">Don&apos;t have account?
                     <Link href="/sign-up" className="text-blue-600 hover:underline"> Sign up</Link>
                 </div>
             </form>

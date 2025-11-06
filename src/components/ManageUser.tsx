@@ -3,29 +3,31 @@
 import { FormEvent, useEffect, useState } from "react"
 import Link from "next/link";
 import APIStatusCard from "./APIStatusCard";
+import { APIResponse } from "@/actions/user";
+import { FormDataPayload } from "@/actions/auth";
 
 interface ManageUserProps {
-    submitHandler: (name:string,email:string,dateOfBirth:string,password:string) => void;
-    apiStatus: any;
-    userData?: any;
+    submitHandler: (name: string, email: string, dateOfBirth: string, password: string) => void;
+    apiStatus: APIResponse | undefined;
+    userData?: FormDataPayload | null;
     isSignUp?: boolean;
 }
 
-export default function ManageUser({ submitHandler, apiStatus, userData, isSignUp }:ManageUserProps ) {
+export default function ManageUser({ submitHandler, apiStatus, userData, isSignUp }: ManageUserProps) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState("");
 
-    
+
     function formSubmitHandler(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         console.log("Submitting:", { name, email, password, dateOfBirth });
         submitHandler(name, email, dateOfBirth, password);
     }
 
-    
+
     useEffect(() => {
         console.log("User data received:", userData);
 
@@ -45,7 +47,7 @@ export default function ManageUser({ submitHandler, apiStatus, userData, isSignU
             </h2>
 
             {/* ✅ API success/error message card */}
-            <APIStatusCard apiStatus={apiStatus} />
+            {apiStatus && <APIStatusCard apiStatus={apiStatus} />}
 
             <form onSubmit={formSubmitHandler}>
                 {/* Name */}
