@@ -9,7 +9,7 @@ export function middleware(req: NextRequest) {
   console.log("Current pathname:", pathname);
 
   // Example: protect certain routes
-  const isPublic = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+  const isPublic = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up") || pathname === "/" || (pathname.startsWith("/blog")&& !pathname.endsWith("/update"))
 
   const token = req.cookies.get("token")?.value;
 

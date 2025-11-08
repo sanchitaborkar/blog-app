@@ -52,7 +52,7 @@ export async function updateProfile(payload: FormDataPayload){
         await connectDB()
         const authData = await authGuard()
         if(authData.authenticated === false){
-            return { success: false, message: "Unauthorized access" };
+            return { success: false, message: authData.message };
         }
         const user = await User.findById(authData?.user?.id);
         if (!user) {

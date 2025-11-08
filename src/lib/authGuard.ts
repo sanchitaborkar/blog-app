@@ -1,5 +1,6 @@
 'use server'
-import jwt, { JwtPayload } from "jsonwebtoken";
+import User from "@/model/User";
+import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
 interface User {
@@ -20,8 +21,14 @@ export default async function authGuard(): Promise<AuthGuard> {
     if (!token) return { authenticated: false, message: "No token in cookies" };
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as string | jwt.JwtPayload;
-        return { authenticated: true, user: decoded as {id: string} };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return { authenticated: false, message: "User not found" };
+        }
+
+        return { authenticated: true, user: decoded };
     } catch {
         return { authenticated: false, message: "Invalid token" };
     }
