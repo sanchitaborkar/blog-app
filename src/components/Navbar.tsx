@@ -86,8 +86,8 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <Link
-                href="/my-blog"
-                className={`hover:text-blue-600 ${pathname === "/my-blog" ? "text-blue-600 font-semibold" : ""
+                href="/my-blogs"
+                className={`hover:text-blue-600 ${pathname === "/my-blogs" ? "text-blue-600 font-semibold" : ""
                   }`}
               >
                 My Blogs

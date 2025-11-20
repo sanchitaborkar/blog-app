@@ -15,12 +15,12 @@ export default function UpdateBlog() {
 
     const router = useRouter();
 
-    const handleSubmit = async (title: string, content: string) => {
-        const blog = { title, content };
-        const result = await updateBlog(id, blog);
+    const handleSubmit = async (formData: FormData) => {
+        // const blog = { title, content };
+        const result = await updateBlog(id, formData);
         setApiStatus(result);
-        router.push("/my-blog"); // Redirect to home
-    };
+        router.push("/my-blogs"); // Redirect to home
+      };
 
     async function getBlogData() {
         const data = id && await getBlogById(id);

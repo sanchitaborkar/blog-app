@@ -5,11 +5,13 @@ import authGuard from "@/lib/authGuard";
 import { connectDB } from "@/lib/mongodb"
 import Blog from "@/model/Blog";
 import { APIResponse } from "./user";
+import { writeFile } from "fs/promises";
 
 export interface Blogs {
-    _id:string;
+    _id: string;
     title: string;
     content: string;
+    image: string[];
     author: {
         name: string;
     };
@@ -19,10 +21,11 @@ export interface Blogs {
 interface BLogPayload {
     title: string;
     content: string;
+    image: string;
     author?: string;
 }
 
-export async function createBlog(payload: BLogPayload): Promise<APIResponse> {
+export async function createBlog(formData: FormData): Promise<APIResponse> {
     try {
         await connectDB();
 
@@ -31,25 +34,63 @@ export async function createBlog(payload: BLogPayload): Promise<APIResponse> {
             return { success: false, message }
         }
 
-        if (user?.id) {
-            payload.author = user?.id;
+        const title = formData.get("title") as string;
+        const content = formData.get("content") as string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const imageFileData = formData.getAll("image") as any;
+        console.log(3254345345, imageFileData);
+
+
+        const imageUrls = [];
+
+        // ✅ Save image locally
+        if (imageFileData) {
+
+            for (const file of imageFileData) {
+                try {
+                    if (file && file.size > 0) {
+                        const bytes = await file.arrayBuffer();
+                        const buffer = Buffer.from(bytes);
+
+                        const filename = `${Date.now()}-${file.name}`;
+                        await writeFile(`public/uploads/${filename}`, buffer);
+
+                        imageUrls.push(`/uploads/${filename}`);
+                    }
+                } catch (error) {
+                    console.log(544331, error);
+                }
+            }
         }
 
-        await Blog.create(payload);
+        // ✅ Save blog with image path
+        await Blog.create({
+            title,
+            content,
+            author: user?._id,
+            image: imageUrls,
+        });
+
         return { success: true, message: "Blog created successfully" };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+        console.log(34535, error);
+
         return { success: false, message: error?.message }
     }
 
 }
-export async function getAllBlog(): Promise<Blogs[]> {
+export async function getAllBlog(search?: string): Promise<Blogs[]> {
     try {
-        await connectDB()
-        const { authenticated, user, message } = await authGuard();
+        await connectDB();
+        const query = {
+            $or: [
+                { title: { $regex: search, $options: "i" } },
+                { content: { $regex: search, $options: "i" } }
+            ]
+        }
 
-        console.log(authenticated, user, message);
-        const list = await Blog.find()
+        const list = await Blog.find(search ? query : {})
             .populate("author", "name email")
             .sort({ updatedAt: -1 })
             .lean();
@@ -66,9 +107,9 @@ export async function getAllBlog(): Promise<Blogs[]> {
 export async function getBlog(): Promise<Blogs[]> { // my blog
     try {
         await connectDB()
-        const { authenticated, user, message } = await authGuard();
+        const { user } = await authGuard();
 
-        const list = await Blog.find({ author: user?.id })
+        const list = await Blog.find({ author: user?._id })
             .populate("author", "name email")
             .sort({ updatedAt: -1 })
             .lean();
@@ -85,7 +126,7 @@ export async function getBlog(): Promise<Blogs[]> { // my blog
 export async function getBlogById(id: string): Promise<Blogs | null> { // my blog
     try {
         await connectDB()
-        const { authenticated, user, message } = await authGuard();
+        await authGuard();
 
         const blog = await Blog.findById(id).populate("author", "name email").lean();
         return JSON.parse(JSON.stringify(blog));
@@ -102,10 +143,10 @@ export async function getBlogById(id: string): Promise<Blogs | null> { // my blo
 export async function deleteBlog(id: string) {
     try {
         await connectDB();
-        const { authenticated, user, message } = await authGuard();
+        const { authenticated, message } = await authGuard();
 
         if (!authenticated) {
-            return { success: false, message: "Unauthorized access" };
+            return { success: false, message };
         }
 
         const blog = await Blog.findById(id);
@@ -124,7 +165,7 @@ export async function deleteBlog(id: string) {
 
 
 }
-export async function updateBlog(id: string, payload: BLogPayload) {
+export async function updateBlog(id: string, formData: FormData) {
     try {
         await connectDB()
         const authData = await authGuard()
@@ -136,6 +177,47 @@ export async function updateBlog(id: string, payload: BLogPayload) {
         if (!blog) {
             return { success: false, message: "Blog not found" };
         }
+
+        const payload = {
+            title: formData.get("title"),
+            content: formData.get("content")
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const imageFileData = formData.getAll("image") as any;
+        console.log(3254345345, imageFileData);
+
+
+        const imageUrls = [];
+
+        // ✅ Save image locally
+        if (imageFileData) {
+
+            for (const file of imageFileData) {
+                try {
+                    if (typeof file === 'string' && file.startsWith('/uploads')) {
+                        imageUrls.push(file);
+                    } else {
+                        if (file && file.size > 0) {
+                            const bytes = await file.arrayBuffer();
+                            const buffer = Buffer.from(bytes);
+
+                            const filename = `${Date.now()}-${file.name}`;
+                            await writeFile(`public/uploads/${filename}`, buffer);
+
+                            imageUrls.push(`/uploads/${filename}`);
+                        }
+                    }
+                } catch (error) {
+                    console.log(544331, error);
+                }
+            }
+        }
+
+        if (imageUrls.length) payload.image = imageUrls;
+
+        console.log(34535, payload);
+
 
         await Blog.findByIdAndUpdate(id, { $set: payload });
         return { success: true, message: "Blog updated successfully" };

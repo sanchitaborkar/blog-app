@@ -1,14 +1,18 @@
 'use client'
 
-import { Blogs,deleteBlog,getBlog } from "@/actions/blog";
+import { Blogs, deleteBlog, getBlog } from "@/actions/blog";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Pencil, Trash2, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import APIStatusCard from "@/components/APIStatusCard";
+import { APIResponse } from "@/actions/user";
 
 export default function MyBlogs() {
   const [blogData, setBlogData] = useState<Blogs[] | null>(null);
+    const [apiStatus, setApiStatus] = useState<APIResponse | undefined>();
+
   const router = useRouter();
 
   async function getBlogData() {
@@ -21,11 +25,12 @@ export default function MyBlogs() {
     if (!confirmed) return;
 
     const res = await deleteBlog(id);
+    setApiStatus(res)
     if (res.success) {
-      alert("✅ Blog deleted successfully!");
+      // alert("✅ Blog deleted successfully!");
       getBlogData(); // refresh the blog list
     } else {
-      alert("❌ " + res.message);
+      // alert("❌ " + res.message);
     }
   }
 
@@ -63,6 +68,8 @@ export default function MyBlogs() {
         </Link>
       </motion.div>
 
+{apiStatus && <APIStatusCard apiStatus={apiStatus} />}
+
       {/* 📰 Blog List */}
       {blogData?.length > 0 ? (
         <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -72,11 +79,17 @@ export default function MyBlogs() {
               whileHover={{ y: -5 }}
               transition={{ type: "spring", stiffness: 200 }}
               className="relative bg-white/80 border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl p-6 backdrop-blur-md overflow-hidden"
-            >
+              onClick={(e) => {
+                e.stopPropagation()
+                router.push(`/blog/${blog._id}`);
+              }}>
+
+
               {/* Glow overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 to-transparent opacity-40 rounded-2xl pointer-events-none"></div>
+              <img className="h-52" src={Array.isArray(blog.image) ? blog.image[0] : '/default.webp'} alt="" />
 
-              <div className="relative z-10 flex flex-col justify-between h-full">
+              <div className="relative z-10 flex flex-col justify-between h-fit">
                 <div>
                   <h2 className="text-2xl font-semibold text-gray-900 mb-3 line-clamp-2">
                     {blog.title}
@@ -106,16 +119,23 @@ export default function MyBlogs() {
                   </Link>
 
                   <div className="flex gap-3">
-                    <Link
-                      href={`/blog/${blog._id}/update`}
+                    <div
                       className="p-2 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
                       title="Edit"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        router.push(`/blog/${blog._id}/update`);
+                      }}
                     >
                       <Pencil className="w-4 h-4" />
-                    </Link>
+                    </div>
 
                     <button
-                      onClick={() => handleDelete(blog._id!)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(blog._id!)
+                      }
+                      }
                       className="p-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition"
                       title="Delete"
                     >
@@ -129,7 +149,7 @@ export default function MyBlogs() {
         </motion.div>
       ) : (
         <div className="text-center text-gray-500 mt-20 text-lg">
-          😔 You haven’t written any blogs yet.  
+          😔 You haven’t written any blogs yet.
           <Link href="/create" className="text-blue-600 font-medium ml-1 hover:underline">
             Write your first one!
           </Link>
