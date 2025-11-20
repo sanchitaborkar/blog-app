@@ -1,9 +1,10 @@
 'use client'
 
 import { FormDataPayload } from "@/actions/auth";
-import { APIResponse, getUserDetails, updateProfile } from "@/actions/user";
+import { APIResponse, updateProfile } from "@/actions/user";
 import ManageUser from "@/components/ManageUser";
 import { useUserContext } from "@/context/UserContext";
+import authGuard from "@/lib/authGuard";
 import { useEffect, useState } from "react";
 
 export default function Profile() {
@@ -12,8 +13,8 @@ export default function Profile() {
     const { setUser } = useUserContext();
 
     async function getUserData() {
-            const data = await getUserDetails();
-            if (!data) return;
+            const data = await authGuard();
+            if (!data?.user) return;
             setUserData(data?.user);
         }
     

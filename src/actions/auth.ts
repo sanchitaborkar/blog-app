@@ -10,7 +10,7 @@ export interface FormDataPayload {
   name: string;
   email: string;
   password?: string;
-  dob: string;
+  dob?: string;
 }
 
 export async function loginUser(email: string, password: string) {

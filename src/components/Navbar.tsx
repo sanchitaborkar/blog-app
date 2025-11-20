@@ -1,11 +1,12 @@
 "use client";
 
-import { getUserDetails } from "@/actions/user";
 import { logoutUser } from "@/actions/logout";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUserContext } from "@/context/UserContext";
+import authGuard from "@/lib/authGuard";
+import { isPublicRoute } from "@/utils/constants";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -14,12 +15,12 @@ export default function Navbar() {
   const { user, setUser } = useUserContext();
 
   const userDetails = async () => {
-    try {      
+    try {
       if (user) return;
-      const result = await getUserDetails();
+      const result = await authGuard();
       console.log("User Details:", result);
 
-      if (result?.success) {
+      if (result?.authenticated) {
         setUser(result.user);
         setIsLoggedIn(true);
       } else {
@@ -43,14 +44,14 @@ export default function Navbar() {
       if (res.success) {
         setUser(null);
         setIsLoggedIn(false);
-        router.push("/sign-in");
+        router.push("/");
       } else {
         console.error("Logout failed:", res.message);
       }
     } catch (error) {
       console.error("Logout error:", error);
     }
-  };  
+  };
 
   // Hide navbar on login/signup pages
   if (pathname === "/sign-in" || pathname === "/sign-up") return null;
@@ -81,16 +82,16 @@ export default function Navbar() {
             Create Blog
           </Link>
 
-          <Link
-            href="/my-blog"
-            className={`hover:text-blue-600 ${pathname === "/my-blog" ? "text-blue-600 font-semibold" : ""
-              }`}
-          >
-            My Blogs
-          </Link>
 
           {isLoggedIn ? (
             <>
+              <Link
+                href="/my-blog"
+                className={`hover:text-blue-600 ${pathname === "/my-blog" ? "text-blue-600 font-semibold" : ""
+                  }`}
+              >
+                My Blogs
+              </Link>
               {/* 👇 Clickable Username */}
               <Link
                 href="/profile"
@@ -98,6 +99,7 @@ export default function Navbar() {
               >
                 Hi, {user?.name || "User"}
               </Link>
+
 
               <button
                 onClick={handleLogout}
