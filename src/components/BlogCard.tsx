@@ -20,7 +20,9 @@ export default function BlogCard({blog}: {blog: Blogs}) {
               {/* Decorative gradient glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 to-transparent opacity-40 pointer-events-none rounded-3xl"></div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="object-cover w-full h-52" src={(blog.image && Array.from(blog.image)) ? blog.image[0] : '/default.webp'} alt="" />
+              <img className="object-cover w-full h-52" src={(blog.image && Array.from(blog.image)) ? blog.image[0] : '/default.webp'} alt="" onError={(e) => {
+                e.currentTarget.src = '/default.webp';
+              }} />
               <div className="relative z-10">
                 <h2 className="text-2xl font-bold text-gray-900 mb-3 line-clamp-2">
                   {blog.title}

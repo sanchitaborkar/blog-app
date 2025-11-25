@@ -6,6 +6,7 @@ import { connectDB } from "@/lib/mongodb"
 import Blog from "@/model/Blog";
 import { APIResponse } from "./user";
 import { writeFile } from "fs/promises";
+import cloudinary from "@/lib/cloudinary";
 
 export interface Blogs {
     _id: string;
@@ -49,13 +50,17 @@ export async function createBlog(formData: FormData): Promise<APIResponse> {
             for (const file of imageFileData) {
                 try {
                     if (file && file.size > 0) {
-                        const bytes = await file.arrayBuffer();
-                        const buffer = Buffer.from(bytes);
 
-                        const filename = `${Date.now()}-${file.name}`;
-                        await writeFile(`public/uploads/${filename}`, buffer);
+                        const arrayBuffer = await file.arrayBuffer();
+                        const dataURI = Buffer.from(arrayBuffer).toString('base64');
 
-                        imageUrls.push(`/uploads/${filename}`);
+                        const base64 = `data:${file.type};base64,${dataURI}`;
+
+                        const result = await cloudinary.uploader.upload(base64, {
+                            folder: "blog-images",
+                        });
+                        imageUrls.push(result.secure_url);
+
                     }
                 } catch (error) {
                     console.log(544331, error);
@@ -178,7 +183,7 @@ export async function updateBlog(id: string, formData: FormData) {
             return { success: false, message: "Blog not found" };
         }
 
-        const payload = {
+        const payload: BLogPayload = {
             title: formData.get("title"),
             content: formData.get("content")
         }
@@ -198,14 +203,29 @@ export async function updateBlog(id: string, formData: FormData) {
                     if (typeof file === 'string' && file.startsWith('/uploads')) {
                         imageUrls.push(file);
                     } else {
+                        console.log(98989898, file, file.buffer);
                         if (file && file.size > 0) {
-                            const bytes = await file.arrayBuffer();
-                            const buffer = Buffer.from(bytes);
 
-                            const filename = `${Date.now()}-${file.name}`;
-                            await writeFile(`public/uploads/${filename}`, buffer);
+                            const arrayBuffer = await file.arrayBuffer();
+                            const dataURI = Buffer.from(arrayBuffer).toString('base64');
 
-                            imageUrls.push(`/uploads/${filename}`);
+                            const base64 = `data:${file.type};base64,${dataURI}`;
+
+                            const result = await cloudinary.uploader.upload(base64, {
+                                folder: "blog-images",
+                            });
+
+                            console.log(65656, result);
+
+
+                            imageUrls.push(result.secure_url);
+                            // const bytes = await file.arrayBuffer();
+                            // const buffer = Buffer.from(bytes);
+
+                            // const filename = `${Date.now()}-${file.name}`;
+                            // await writeFile(`public/uploads/${filename}`, buffer);
+
+                            // imageUrls.push(`/uploads/${filename}`);
                         }
                     }
                 } catch (error) {
@@ -228,5 +248,4 @@ export async function updateBlog(id: string, formData: FormData) {
 
     }
 }
-
 

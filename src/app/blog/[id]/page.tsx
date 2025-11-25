@@ -59,10 +59,16 @@ export default function BlogDetail({ params }: { params: { id: string } }) {
         {
           blog.image && Array.from(blog.image)?.map((item, index) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img className={`cursor-pointer w-20 h-20 ${index !== selectedImg ? 'opacity-50' : ''}`} key={index} src={item} alt="" onClick={(e) => {
+            <img className={`cursor-pointer w-20 h-20 ${index !== selectedImg ? 'opacity-50' : ''}`} key={index} src={item || ''} alt="" onClick={(e) => {
               e.stopPropagation();
               setSelectedImg(index);
-            }} />
+            }}
+              onError={(e) => {
+                console.log(786877687);
+                
+                e.currentTarget.src = '/default.webp';
+              }}
+            />
           ))
         }
       </div>
